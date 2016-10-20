@@ -1,4 +1,7 @@
 #!/usr/bin/perl
+#
+# Play out hands for testing basic strategy and betting regressions
+#
 
 use Games::Blackjack;
 use Data::Dumper;
@@ -180,3 +183,60 @@ sub hand_to_array {
     }
     return @cards;
 }
+
+
+=head 
+
+example output:
+
+New Hand
+S 16 against 3
+hit dealers 13
+bet:44  w/l:1   $0  dealer_up:3 dealer_final:BUST   player_final:6
+
+New Hand
+double down against 7?
+H 5 against 7
+H 15 against 7
+hit dealers 13
+bet:26  w/l:-1  $44 dealer_up:7 dealer_final:21 player_final:BUST
+
+New Hand
+H 12 against 2
+S 20 against 2
+hit dealers 12
+bet:83  w/l:1   $18 dealer_up:2 dealer_final:18 player_final:20
+
+New Hand
+S 19 against 5
+hit dealers 6
+hit dealers 13
+bet:86  w/l:1   $101    dealer_up:5 dealer_final:18 player_final:19
+
+New Hand
+S 17 against 3
+hit dealers 9
+hit dealers 16
+bet:91  w/l:-1  $187    dealer_up:3 dealer_final:20 player_final:17
+
+New Hand
+S 14 against 5
+hit dealers 9
+bet:72  w/l:-1  $96 dealer_up:5 dealer_final:19 player_final:14
+
+New Hand
+surrender our 19?
+S 19 against 11
+hit dealers 11
+hit dealers 13
+bet:72  w/l:0   $24 dealer_up:11    dealer_final:19 player_final:19
+
+New Hand
+double down against 3?
+D 11 against 3
+hit dealers 13
+bet:12  w/l:1   $24 dealer_up:3 dealer_final:BUST   player_final:11
+
+Total W/L: $36
+
+=cut

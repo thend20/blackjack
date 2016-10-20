@@ -41,9 +41,11 @@ while ( $SHOE->remaining() > 10 ) {
     # get the dealer up card
     my $up_card = start_hand($player, $dealer);
 
+    # we need a simple array of the start cards for initial processing
     my @cards = hand_to_array($player);
 
     # split or double?
+    #### THESE DONT WORK YET
     my $additional_bet = preprocces_hand($up_card, $player, @cards);
     my $double = double_down($up_card, $player);
 
@@ -58,11 +60,12 @@ while ( $SHOE->remaining() > 10 ) {
         hit_me($player) if $hit eq 'H';
         $player_done++ if $hit eq 'S';
 
-        #tmp
+        #### This will be gone after we can process splits and doubles
         $player_done++ unless $hit eq 'H';
     }
 
-    #### FIGURE OUT SPLITS AND DOUBLES
+    #### TODO: FIGURE OUT SPLITS AND DOUBLES
+    #### THIS INCLUDES MULTIPLE PLAYER HANDS
 
     # Play the dealers hand
     my $dealer_done;
@@ -72,6 +75,7 @@ while ( $SHOE->remaining() > 10 ) {
         # Bust?
         last unless $count;
 
+        # Hit to 17
         if ($count < 17) {
             print "hit dealers $count\n";
             hit_me($dealer);
@@ -107,7 +111,6 @@ sub process_hand {
         print "S $count against $up_card\n";
         return 'S';
     }
-
 
     if ($BASIC_STRATEGY{$count}) {
         print $BASIC_STRATEGY{$count}[$up_card];

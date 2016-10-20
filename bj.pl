@@ -8,14 +8,14 @@ use Data::Dumper;
 use Log::Log4perl qw(:easy);
 #Log::Log4perl->easy_init($DEBUG);
 
-my $DECKS = 1;
+my $DECKS = 6;
 my $HANDS = 100;
 
 my %BASIC_STRATEGY = (
     # Dealer has  2 3 4 5 6 7 8 9 10 11
     9 =>  [qw(0 0 H D D D D H H H  H  H)],
     10 => [qw(0 0 D D D D D D D D  H  H)],
-    11 => [qw(0 0 D D D D D D D D  D  H)],
+    11 => [qw(0 0 D D D D D D D D  H  H)],
     12 => [qw(0 0 H H S S S H H H  H  H)],
     13 => [qw(0 0 S S S S S H H H  H  H)],
     14 => [qw(0 0 S S S S S H H H  H  H)],
@@ -36,6 +36,7 @@ while ( $SHOE->remaining() > 10 ) {
 
     # randomize bet for now
     my $init_bet = int(rand(90)) + 10;
+    my $final_bet = $init_bet;
 
     # Create two hands, player/dealer
     my $player = Games::Blackjack::Hand->new(shoe => $SHOE);
@@ -47,10 +48,9 @@ while ( $SHOE->remaining() > 10 ) {
     # we need a simple array of the start cards for initial processing
     my @cards = hand_to_array($player);
 
-    # split or double?
+    # split
     #### THESE DONT WORK YET
     my $additional_bet = preprocces_hand($up_card, $player, @cards);
-    my $double = double_down($up_card, $player);
 
     # Play the players hand
     my $player_done;
@@ -60,14 +60,19 @@ while ( $SHOE->remaining() > 10 ) {
 
         # what do we do?
         my $hit = process_hand($up_card, $player);
-        hit_me($player) if $hit eq 'H';
-        $player_done++ if $hit eq 'S';
+        hit_me($player) if $hit =~ /[HD]/;
+
+        # We are done on Stand and Double
+        $player_done++ if $hit =~ /SD/;
+
+        # Double down?
+        $final_bet=$init_bet * 2 if $hit eq 'D';
 
         #### This will be gone after we can process splits and doubles
         $player_done++ unless $hit eq 'H';
     }
 
-    #### TODO: FIGURE OUT SPLITS AND DOUBLES
+    #### TODO: FIGURE OUT SPLITS
     #### THIS INCLUDES MULTIPLE PLAYER HANDS
 
     # Play the dealers hand
@@ -91,9 +96,9 @@ while ( $SHOE->remaining() > 10 ) {
 
     my $sc_player = $player->count("hard") || "BUST";
     my $sc_dealer = $dealer->count("hard") || "BUST";
-    print "bet:$init_bet\tw/l:$result\t\$$bank_roll\tdealer_up:$up_card\tdealer_final:$sc_dealer\tplayer_final:$sc_player\n";
+    print "bet:$init_bet\tfinal_bet:$final_bet\tw/l:$result\t\$$bank_roll\tdealer_up:$up_card\tdealer_final:$sc_dealer\tplayer_final:$sc_player\n";
 
-    $bank_roll += $result * $init_bet;
+    $bank_roll += $result * $final_bet;
 }
 
 print "\nTotal W/L: \$$bank_roll\n";
@@ -147,16 +152,6 @@ sub preprocces_hand {
     #return more betting?
 }
 
-sub double_down {
-    my $up_card = shift;
-    my $player = shift;
-
-    my $count = $player->count("soft");
-
-    if ($count <= 11) {
-        print "double down against $up_card?\n";
-    }
-}
 
 # deals out cards, returns the dealers up card
 sub start_hand {

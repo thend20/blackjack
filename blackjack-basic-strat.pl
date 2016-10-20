@@ -13,6 +13,7 @@ my $STOPLOSS = -250;
 my $STOPWIN = 350;
 
 my %BASIC_STRATEGY = (
+    # H=hit, S=stand, D=double-down, s=split
     # Dealer has  2 3 4 5 6 7 8 9 10 11
     9 =>  [qw(0 0 H D D D D H H H  H  H)],
     10 => [qw(0 0 D D D D D D D D  H  H)],
@@ -22,6 +23,19 @@ my %BASIC_STRATEGY = (
     14 => [qw(0 0 S S S S S H H H  H  H)],
     15 => [qw(0 0 S S S S S H H H  H  H)],
     16 => [qw(0 0 S S S S S H H H  H  H)],
+    As => [qw(0 0 s s s s s s s s  s  s)],
+    2s => [qw(0 0 s s s s s s s s  s  s)],
+    3s => [qw(0 0 s s s s s s s s  s  s)],
+    4s => [qw(0 0 s s s s s s s s  s  s)],
+    5s => [qw(0 0 s s s s s s s s  s  s)],
+    6s => [qw(0 0 s s s s s s s s  s  s)],
+    7s => [qw(0 0 s s s s s s s s  s  s)],
+    8s => [qw(0 0 s s s s s s s s  s  s)],
+    9s => [qw(0 0 s s s s s s s s  s  s)],
+    10s=> [qw(0 0 s s s s s s s s  s  s)],
+    Js => [qw(0 0 s s s s s s s s  s  s)],
+    Qs => [qw(0 0 s s s s s s s s  s  s)],
+    Ks => [qw(0 0 s s s s s s s s  s  s)],
 );
 
 my @BET = qw(10 15 20 25 30 35 40 45 50);

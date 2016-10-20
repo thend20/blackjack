@@ -9,7 +9,8 @@ use Log::Log4perl qw(:easy);
 #Log::Log4perl->easy_init($DEBUG);
 
 my $DECKS = 6;
-my $HANDS = 100;
+my $STOPLOSS = -250;
+my $STOPWIN = 350;
 
 my %BASIC_STRATEGY = (
     # Dealer has  2 3 4 5 6 7 8 9 10 11
@@ -21,21 +22,21 @@ my %BASIC_STRATEGY = (
     14 => [qw(0 0 S S S S S H H H  H  H)],
     15 => [qw(0 0 S S S S S H H H  H  H)],
     16 => [qw(0 0 S S S S S H H H  H  H)],
-
 );
 
+my @BET = qw(10 15 20 25 30 35 40 45 50);
 
 # Create new shoe of cards
 my $SHOE = Games::Blackjack::Shoe->new(nof_decks => $DECKS);
 
 my $last_winner;
 my $bank_roll = 0;
+my $hands=1;
 while ( $SHOE->remaining() > 10 ) {
-    print "\nNew Hand\n";
-
+    print "\nHand $hands\n";
 
     # randomize bet for now
-    my $init_bet = int(rand(90)) + 10;
+    my $init_bet = $BET[int(rand(9))];
     my $final_bet = $init_bet;
 
     # Create two hands, player/dealer
@@ -63,13 +64,11 @@ while ( $SHOE->remaining() > 10 ) {
         hit_me($player) if $hit =~ /[HD]/;
 
         # We are done on Stand and Double
-        $player_done++ if $hit =~ /SD/;
+        $player_done++ if $hit =~ /[SD]/;
 
         # Double down?
         $final_bet=$init_bet * 2 if $hit eq 'D';
 
-        #### This will be gone after we can process splits and doubles
-        $player_done++ unless $hit eq 'H';
     }
 
     #### TODO: FIGURE OUT SPLITS
@@ -99,6 +98,13 @@ while ( $SHOE->remaining() > 10 ) {
     print "bet:$init_bet\tfinal_bet:$final_bet\tw/l:$result\t\$$bank_roll\tdealer_up:$up_card\tdealer_final:$sc_dealer\tplayer_final:$sc_player\n";
 
     $bank_roll += $result * $final_bet;
+    $hands++;
+
+    # stop-loss stop-win
+    last if $bank_roll <= $STOPLOSS;
+    last if $bank_roll >= $STOPWIN;
+
+
 }
 
 print "\nTotal W/L: \$$bank_roll\n";
@@ -141,10 +147,12 @@ sub preprocces_hand {
 
     my $count = $player->count("soft");
 
+    # we might split on dupes
     if ($cards[0] eq $cards[1]) {
         print "split @cards?\n";
     }
 
+    # we might surrender on a dealers 9+
     if ($up_card > 9) {
         print "surrender our $count?\n";
     }
